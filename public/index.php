@@ -10,11 +10,19 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 
 $app = AppFactory::create();
 
-$app->get('/', function (Request $request, Response $response){
+$app->get('/products', function (Request $request, Response $response) {
 
-    $response->getBody()->write("Olá mundo!");
+    $database = new App\Database;
 
-    return $response;
+    $repository = new App\Repositories\ProductRepository($database);
+
+    $data = $repository->getAll();
+
+    $body = json_encode($data);
+
+    $response->getBody()->write($body);
+
+    return $response->withHeader('Content-Type', 'application/json');
 });
 
 $app->run();
