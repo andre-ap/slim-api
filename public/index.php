@@ -5,16 +5,23 @@ declare(strict_types=1);
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use DI\ContainerBuilder;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+define ('APP_ROOT', dirname(__DIR__));
+
+require APP_ROOT . '/vendor/autoload.php';
+
+$builder = new ContainerBuilder();
+
+$container = $builder->addDefinitions(APP_ROOT . '/config/definitions.php')->build();
+
+AppFactory::setContainer($container);
 
 $app = AppFactory::create();
 
 $app->get('/products', function (Request $request, Response $response) {
 
-    $database = new App\Database;
-
-    $repository = new App\Repositories\ProductRepository($database);
+    $repository = $this->get(App\Repositories\ProductRepository::class);
 
     $data = $repository->getAll();
 
